@@ -1,0 +1,27 @@
+{
+  "title": "AI-Driven Absolute Return",
+  "description": "A research company that leverages the most advanced artificial intelligence techniques and proprietary research framework to analyze financial data and predict future ETF movements.",
+  "metrics": [
+    { "label": "Annualized Return", "value": "14.2%" },
+    { "label": "Annualized Volatility", "value": "7.8%" },
+    { "label": "Sharpe Ratio", "value": "1.52" },
+    { "label": "Winning Months", "value": "50.2%" },
+    { "label": "Maximum Drawdown", "value": "4.4%" }
+  ],
+  "strategy": "The strategy is designed to provide an absolute return on traditional market products while being decorrelated with the main asset classes, acting as a mix of long-short equity and global macro strategy.",
+  "general_information": {
+    "Novi Symbol": "EXRE_1",
+    "Stage": "Live",
+    "Source": "Track Record",
+    "Inception Date": "July 2020",
+    "Instrument": "US Equity",
+    "Location": "Paris"
+  },
+  "return_statistics": [
+    { "period": "1M", "best": "2.77", "worst": "-1.76", "avg": "0.05", "mdn": "0.01" },
+    { "period": "3M", "best": "3.87", "worst": "-2.53", "avg": "0.16", "mdn": "0.08" },
+    { "period": "1Y", "best": "7.90", "worst": "-3.37", "avg": "0.64", "mdn": "0.40" },
+    { "period": "3Y", "best": "10.03", "worst": "-3.13", "avg": "1.91", "mdn": "1.12" },
+    { "period": "5Y", "best": "13.45", "worst": "-3.38", "avg": "3.16", "mdn": "2.49" }
+  ]
+}

@@ -37,38 +37,17 @@
 <!--<main class="w-[794px] h-[1123px] bg-gray-100 mx-auto my-10 p-8">-->
 <main class="w-[794px] bg-gray-100 mx-auto my-6 p-4">
 
-    <h1 class="text-4xl font-bold text-[#4a4cb3] mb-6">AI-Driven Absolute Return</h1>
-    <p class="text-sm text-gray-700 leading-snug">A research company that leverages the most advanced artificial intelligence techniques and proprietary research framework to analyze financial data and predict future ETF movements.</p>
+    <h1 id="title" class="text-4xl font-bold text-[#4a4cb3] mb-6">Loading ...</h1>
+    <p id="description" class="text-sm text-gray-700 leading-snug">Loading ...</p>
 
-    <section class="flex mt-6 space-x-6">
-    <div class="w-[140px] h-[100px] bg-white shadow-md rounded-md flex flex-col items-center justify-center text-center p-2">
-            <div class="text-xl font-bold text-[#4a4cb3]">14.2%</div>
-            <div class="text-xs text-gray-600">Annualized Return</div>
-        </div>
-        <div class="w-[140px] h-[100px] bg-white shadow-md rounded-md flex flex-col items-center justify-center text-center p-2">
-            <div class="text-xl font-bold text-[#4a4cb3]">7.8%</div>
-            <div class="text-xs text-gray-600">Annualized Volatility</div>
-        </div>
-        <div class="w-[140px] h-[100px] bg-white shadow-md rounded-md flex flex-col items-center justify-center text-center p-2">
-            <div class="text-xl font-bold text-[#4a4cb3]">1.52</div>
-            <div class="text-xs text-gray-600">Sharpe Ratio</div>
-        </div>
-        <div class="w-[140px] h-[100px] bg-white shadow-md rounded-md flex flex-col items-center justify-center text-center p-2">
-            <div class="text-xl font-bold text-[#4a4cb3]">50.2%</div>
-            <div class="text-xs text-gray-600">Winning Months</div>
-        </div>
-        <div class="w-[140px] h-[100px] bg-white shadow-md rounded-md flex flex-col items-center justify-center text-center p-2">
-            <div class="text-xl font-bold text-[#4a4cb3]">4.4%</div>
-            <div class="text-xs text-gray-600">Maximum Drawdown</div>
-        </div>
-    </section>
+    <section id="metrics" class="flex mt-6 space-x-6"></section>
 
     <section class="flex mt-6 space-x-6 min-h-[220px]">
     <!-- Left: Strategy text -->
         <div class="w-[45%] bg-white p-4 shadow-md rounded-md">
             <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">Strategy</h2>
-            <p class="text-sm text-gray-700 leading-relaxed">
-                The strategy is designed to provide an absolute return on traditional market products while being decorrelated with the main asset classes, acting as a mix of long-short equity and global macro strategy.
+            <p id="strategy" class="text-sm text-gray-700 leading-relaxed">
+                Loading ...
         </div>
         <!-- Right: Chart placeholder -->
         <div class="w-[55%] bg-gray-300 p-4 shadow-inner rounded-md flex items-center justify-center text-sm text-gray-600">
@@ -155,5 +134,45 @@
     </section>
 
 </main>
+
+<script>
+    fetch('data.json')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('title').textContent = data.title;
+        document.getElementById('description').textContent = data.description;
+        document.getElementById('strategy').textContent = data.strategy;
+
+        // Metrics
+        const metricsContainer = document.getElementById('metrics');
+        data.metrics.forEach(m => {
+          metricsContainer.innerHTML += `
+            <div class="w-[140px] h-[100px] bg-white shadow-md rounded-md flex flex-col items-center justify-center text-center p-2">
+              <div class="text-xl font-bold text-[#4a4cb3]">${m.value}</div>
+              <div class="text-xs text-gray-600">${m.label}</div>
+            </div>`;
+        });
+
+        // General Info
+        const infoList = document.getElementById('general-info');
+        for (let key in data.general_information) {
+          infoList.innerHTML += `<li><strong>${key}:</strong> ${data.general_information[key]}</li>`;
+        }
+
+        // Return Stats
+        const statsBody = document.getElementById('return-stats');
+        data.return_statistics.forEach(row => {
+          statsBody.innerHTML += `
+            <tr class="border-b">
+              <td class="py-1 pr-4">${row.period}</td>
+              <td class="py-1 pr-4">${row.best}</td>
+              <td class="py-1 pr-4">${row.worst}</td>
+              <td class="py-1 pr-4">${row.avg}</td>
+              <td class="py-1">${row.mdn}</td>
+            </tr>`;
+        });
+      });
+  </script>
+
 </body>
 </html>
