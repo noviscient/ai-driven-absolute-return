@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>AI-Driven Absolute Return</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         @media print {
             html, body {
@@ -42,20 +43,20 @@
 
     <section id="metrics" class="flex mt-6 space-x-6"></section>
 
-    <section class="flex mt-6 space-x-6 min-h-[220px]">
+    <hr class="my-4 border-t border-gray-300" />
+
+    <section class="flex mt-2 space-x-2 min-h-[255px]">
     <!-- Left: Strategy text -->
-        <div class="w-[45%] bg-white p-4 shadow-md rounded-md">
+        <div class="w-[300px] bg-white p-4 shadow-md rounded-md">
             <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">Strategy</h2>
             <p id="strategy" class="text-sm text-gray-700 leading-relaxed">
                 Loading ...
         </div>
         <!-- Right: Chart placeholder -->
-        <div class="w-[55%] bg-gray-300 p-4 shadow-inner rounded-md flex items-center justify-center text-sm text-gray-600">
-            Chart Placeholder
-        </div>
+        <div id="net-return-chart" class="flex-1 h-[255px]"></div>
     </section>
 
-    <section class="flex mt-6 space-x-6 min-h-[220px]">
+    <section class="flex mt-2 space-x-6 min-h-[255px]">
     <!-- Left: General Information -->
         <div class="w-[45%] bg-white p-4 shadow-md rounded-md">
             <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">General Information</h2>
@@ -68,7 +69,7 @@
         </div>
     </section>
 
-    <section class="flex mt-4 space-x-6 min-h-[220px]">
+    <section class="flex mt-2 space-x-6 min-h-[255px]">
         <!-- Left: Return Statistics -->
         <div class="w-[45%] bg-white p-4 shadow-md rounded-md">
             <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">Return Statistics</h2>
@@ -105,7 +106,7 @@
         const metricsContainer = document.getElementById('metrics');
         data.metrics.forEach(m => {
           metricsContainer.innerHTML += `
-            <div class="w-[140px] h-[100px] bg-white shadow-md rounded-md flex flex-col items-center justify-center text-center p-2">
+            <div class="w-[140px] h-[70px] bg-white shadow-md rounded-md flex flex-col items-center justify-center text-center p-2">
               <div class="text-xl font-bold text-[#4a4cb3]">${m.value}</div>
               <div class="text-xs text-gray-600">${m.label}</div>
             </div>`;
@@ -129,6 +130,46 @@
               <td class="py-1">${row.mdn}</td>
             </tr>`;
         });
+
+        // Plotly: Simplified Net Return Chart with 1 series
+        const plotData = data.net_returns;
+        const dates = plotData.map(row => row.date);
+
+        const trace = {
+            x: dates,
+            y: plotData.map(r => r.strategy_live), // pick the one series to plot
+            mode: 'lines',
+            name: 'Strategy - Live',
+            line: { color: '#4a4cb3', width: 2 }
+        };
+
+        const layout = {
+            margin: { t: 20, r: 20, b: 30, l: 40 },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            showlegend: true,
+            legend: {
+                orientation: 'v',
+                x: 0,
+                y: 1,
+                xanchor: 'left',
+                yanchor: 'top',
+                bgcolor: 'rgba(0,0,0,0)',  // transparent background
+                font: { size: 10 },
+            },
+            xaxis: { tickfont: { size: 10 } },
+            yaxis: { tickformat: '.2f', tickfont: { size: 10 } },
+            height: 220
+        };
+
+        Plotly.newPlot('net-return-chart', [trace], layout, {
+            responsive: true,
+            displayModeBar: false
+        });
+
+
+
+
       });
   </script>
 

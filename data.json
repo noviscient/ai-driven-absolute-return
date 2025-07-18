@@ -6,7 +6,7 @@
     { "label": "Annualized Volatility", "value": "7.8%" },
     { "label": "Sharpe Ratio", "value": "1.52" },
     { "label": "Winning Months", "value": "50.2%" },
-    { "label": "Maximum Drawdown", "value": "4.4%" }
+    { "label": "Max. Drawdown", "value": "4.4%" }
   ],
   "strategy": "The strategy is designed to provide an absolute return on traditional market products while being decorrelated with the main asset classes, acting as a mix of long-short equity and global macro strategy.",
   "general_information": {
@@ -23,5 +23,12 @@
     { "period": "1Y", "best": "7.90", "worst": "-3.37", "avg": "0.64", "mdn": "0.40" },
     { "period": "3Y", "best": "10.03", "worst": "-3.13", "avg": "1.91", "mdn": "1.12" },
     { "period": "5Y", "best": "13.45", "worst": "-3.38", "avg": "3.16", "mdn": "2.49" }
+  ],
+  "net_returns": [
+    { "date": "2024-01", "strategy_live": 0.8, "strategy_track": 0.9, "strategy_backtest": 1.1, "qai": 0.6, "djia": 1.2 },
+    { "date": "2024-02", "strategy_live": 1.2, "strategy_track": 1.1, "strategy_backtest": 1.4, "qai": 0.7, "djia": 0.9 },
+    { "date": "2024-03", "strategy_live": 0.5, "strategy_track": 0.6, "strategy_backtest": 0.8, "qai": 0.4, "djia": 1.0 },
+    { "date": "2024-04", "strategy_live": 1.0, "strategy_track": 0.9, "strategy_backtest": 1.2, "qai": 0.6, "djia": 1.1 },
+    { "date": "2024-05", "strategy_live": 0.6, "strategy_track": 0.7, "strategy_backtest": 1.0, "qai": 0.5, "djia": 1.3 }
   ]
 }
