@@ -5,6 +5,7 @@
     <title>AI-Driven Absolute Return</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <style>
         @media print {
             html, body {
@@ -130,47 +131,123 @@
               <td class="py-1">${row.mdn}</td>
             </tr>`;
         });
+      });
 
-        // Plotly: Simplified Net Return Chart with 1 series
-        const plotData = data.net_returns;
-        const dates = plotData.map(row => row.date);
+      fetch('merged_cum_returns.csv')
+        .then(res => res.text())
+        .then(csvText => {
+            const result = Papa.parse(csvText, { header: true, dynamicTyping: true });
+            const data = result.data;
 
-        const trace = {
-            x: dates,
-            y: plotData.map(r => r.strategy_live), // pick the one series to plot
-            mode: 'lines',
-            name: 'Strategy - Live',
-            line: { color: '#4a4cb3', width: 2 }
-        };
+            const dates = data.map(row => row.date);
+            const strategy = data.map(row => row.Strategy);
+            const qai = data.map(row => row["IQ Hedge Multi-Strategy Tracker ETF (QAI)"]);
+            const dow = data.map(row => row["Dow Jones Industrial Average"]);
 
-        const layout = {
-            margin: { t: 20, r: 20, b: 30, l: 40 },
-            paper_bgcolor: 'rgba(0,0,0,0)',
-            plot_bgcolor: 'rgba(0,0,0,0)',
-            showlegend: true,
-            legend: {
-                orientation: 'v',
-                x: 0,
-                y: 1,
-                xanchor: 'left',
-                yanchor: 'top',
-                bgcolor: 'rgba(0,0,0,0)',  // transparent background
-                font: { size: 10 },
-            },
-            xaxis: { tickfont: { size: 10 } },
-            yaxis: { tickformat: '.2f', tickfont: { size: 10 } },
-            height: 220
-        };
+            // Helper to filter ranges
+            const strategyBacktest = [];
+            const datesBacktest = [];
+            const strategyTrack = [];
+            const datesTrack = [];
+            const strategyLive = [];
+            const datesLive = [];
 
-        Plotly.newPlot('net-return-chart', [trace], layout, {
-            responsive: true,
-            displayModeBar: false
+            data.forEach(row => {
+            const d = row.date;
+            if (d < '2023-01') {
+                strategyBacktest.push(row.Strategy);
+                datesBacktest.push(d);
+            } else if (d >= '2023-01' && d < '2024-01') {
+                strategyTrack.push(row.Strategy);
+                datesTrack.push(d);
+            } else {
+                strategyLive.push(row.Strategy);
+                datesLive.push(d);
+            }
+            });
+
+            const traceStrategyBacktest = {
+                x: datesBacktest,
+                y: strategyBacktest,
+                mode: 'lines',
+                name: 'Strategy - Backtest',
+                line: { color: '#4a4cb3', width: 2, dash: 'dot' },
+                cliponaxis: false,
+                hoverlabel: {namelength :-1}
+            };
+
+            const traceStrategyTrack = {
+                x: datesTrack,
+                y: strategyTrack,
+                mode: 'lines',
+                name: 'Strategy - Track Record',
+                line: { color: '#4a4cb3', width: 2, dash: 'dash' },
+                hoverlabel: {namelength :-1}
+            };
+
+            const traceStrategyLive = {
+                x: datesLive,
+                y: strategyLive,
+                mode: 'lines',
+                name: 'Strategy - Live',
+                line: { color: '#4a4cb3', width: 2 },
+                hoverlabel: {namelength :-1}
+            };
+
+            const traceQAI = {
+                x: dates,
+                y: qai,
+                mode: 'lines',
+                name: 'QAI',
+                line: { color: '#adbdf4', width: 2 },
+                hoverlabel: {namelength :-1}
+            };
+
+            const traceDow = {
+                x: dates,
+                y: dow,
+                mode: 'lines',
+                name: 'Dow Jones Industrial Average',
+                line: { color: '#8dd397', width: 2 },
+                hoverlabel: {namelength :-1}
+            };
+
+            const layout = {
+                margin: { t: 20, r: 20, b: 30, l: 40 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                showlegend: true,
+                legend: {
+                    orientation: 'v',
+                    x: 0,
+                    y: 1,
+                    xanchor: 'left',
+                    yanchor: 'top',
+                    bgcolor: 'rgba(0,0,0,0)',
+                    font: { size: 10 }
+                },
+                xaxis: { tickfont: { size: 10 } },
+                yaxis: { tickformat: '.2f', tickfont: { size: 10 } },
+                height: 255,
+                hoverlabel: {
+                    bgcolor: "#FFF",
+                    bordercolor: "#4a4cb3",
+                    font: { size: 12, color: "#000" }
+                }
+            };
+
+            Plotly.newPlot(
+                'net-return-chart',
+                [traceStrategyBacktest, traceStrategyTrack, traceStrategyLive, traceQAI, traceDow],
+                layout,
+                {
+                    responsive: true,
+                    displayModeBar: false
+                }
+            );
         });
 
 
-
-
-      });
   </script>
 
 </body>
