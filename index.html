@@ -57,22 +57,24 @@
         <div id="net-return-chart" class="flex-1 h-[255px]"></div>
     </section>
 
-    <section class="flex mt-2 space-x-6 min-h-[255px]">
-    <!-- Left: General Information -->
-        <div class="w-[45%] bg-white p-4 shadow-md rounded-md">
+    <section class="flex mt-2 space-x-6 min-h-[215px]">
+        <!-- Left: General Information -->
+        <div class="w-[300px] bg-white p-4 shadow-md rounded-md">
             <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">General Information</h2>
-            <ul id="general-info" class="text-sm text-gray-700 leading-relaxed space-y-1">
-            </ul>
+            <ul id="general-info" class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-700"></ul>
         </div>
-        <!-- Right: Chart placeholder -->
-        <div class="w-[55%] bg-gray-300 p-4 shadow-inner rounded-md flex items-center justify-center text-sm text-gray-600">
-            Chart Placeholder
+
+        <!-- Right: Return Attribution Chart -->
+        <div class="flex-1 p-4">
+            <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">Return Attributions (Last 12 months)</h2>
+            <div id="return-attribution-chart" class="w-full h-[200px]"></div>
         </div>
     </section>
 
-    <section class="flex mt-2 space-x-6 min-h-[255px]">
+
+    <section class="flex mt-2 space-x-6 min-h-[295px]">
         <!-- Left: Return Statistics -->
-        <div class="w-[45%] bg-white p-4 shadow-md rounded-md">
+        <div class="w-[300px] bg-white p-4 shadow-md rounded-md">
             <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">Return Statistics</h2>
             <table class="w-full text-sm text-gray-700 text-left border-collapse">
                 <thead>
@@ -88,8 +90,9 @@
             </table>
         </div>
         <!-- Right: Worst Months -->
-        <div class="w-[55%] bg-gray-300 p-4 shadow-inner rounded-md flex items-center justify-center text-sm text-gray-600">
-            Worst Months Chart Placeholder
+        <div class="flex-1 p-4">
+            <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">Worst Months</h2>
+            <div id="worst-months-chart" class="w-full h-[200px]"></div>
         </div>
     </section>
 
@@ -115,9 +118,15 @@
 
         // General Info
         const infoList = document.getElementById('general-info');
-        for (let key in data.general_information) {
-          infoList.innerHTML += `<li><strong>${key}:</strong> ${data.general_information[key]}</li>`;
-        }
+for (let key in data.general_information) {
+  infoList.innerHTML += `
+    <li>
+      <div class="text-gray-500">${key}</div>
+      <div class="font-semibold">${data.general_information[key]}</div>
+    </li>
+  `;
+}
+
 
         // Return Stats
         const statsBody = document.getElementById('return-stats');
@@ -247,6 +256,126 @@
             );
         });
 
+        fetch('factor_attributions.csv')
+            .then(res => res.text())
+            .then(csvText => {
+            const result = Papa.parse(csvText, { header: true, dynamicTyping: true });
+            const data = result.data.filter(row => row.Label && !isNaN(row.Value));
+
+            const trace = {
+                x: data.map(row => row.Value),
+                y: data.map(row => row.Label),
+                type: 'bar',
+                orientation: 'h',
+                text: data.map(row => `${(row.Value * 100).toFixed(2)}%`),
+                textposition: 'auto',
+                marker: {
+                color: data.map(row => row.Value >= 0 ? '#4a90e2' : '#b0d9f6'),
+                line: { width: 1, color: '#4a4cb3' }
+                },
+                hovertemplate: '%{y}: %{x:.2%}<extra></extra>'
+            };
+
+            const layout = {
+                margin: { t: 10, r: 10, b: 30, l: 80 },
+                xaxis: {
+                    tickformat: '.0%',
+                    range: [-0.16, 0.16],
+                    zeroline: true,
+                    zerolinewidth: 1,
+                    zerolinecolor: 'black',
+                    showgrid: false
+                },
+                yaxis: { automargin: true },
+                height: 215,
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                showlegend: false,
+                hoverlabel: {
+                    bgcolor: "#FFF",
+                    bordercolor: "#4a4cb3",
+                    font: { size: 12, color: "#000" }
+                }
+            };
+
+            Plotly.newPlot('return-attribution-chart', [trace], layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+            });
+
+            fetch('worst_months.csv')
+                .then(res => res.text())
+                .then(csvText => {
+                    const result = Papa.parse(csvText, { header: true, dynamicTyping: true });
+                    const data = result.data.filter(row => row.date && row.Strategy !== undefined);
+
+                    const dates = data.map(row => new Date(row.date).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+
+                    const traceStrategy = {
+                    x: dates,
+                    y: data.map(row => row.Strategy),
+                    name: 'Strategy',
+                    type: 'bar',
+                    marker: { color: '#377eb8' }
+                    };
+
+                    const traceQAI = {
+                        x: dates,
+                        y: data.map(row => row["IQ Hedge Multi-Strategy Tracker ETF (QAI)"]),
+                        name: 'IQ Hedge Multi-Strategy Tracker ETF (QAI)',
+                        type: 'bar',
+                        marker: { color: '#9ecae1' }
+                    };
+
+                    const traceDow = {
+                        x: dates,
+                        y: data.map(row => row["Dow Jones Industrial Average"]),
+                        name: 'Dow Jones Industrial Average',
+                        type: 'bar',
+                        marker: { color: '#a1d99b' }
+                    };
+
+                    const layout = {
+                        barmode: 'group',
+                        margin: { t: 30, r: 10, b: 50, l: 50 },
+                        xaxis: {
+                            tickangle: -35,
+                            tickfont: { size: 10 },
+                            automargin: true
+                        },
+                        yaxis: {
+                            tickformat: '.0%',
+                            tickfont: { size: 10 },
+                            zeroline: true,
+                            zerolinecolor: 'black',
+                            automargin: true
+                        },
+                        legend: {
+                            orientation: 'h',
+                            x: 1,
+                            y: 1.3,
+                            xanchor: 'right',
+                            yanchor: 'top',
+                            bgcolor: 'rgba(0,0,0,0)',
+                            font: { size: 10 }
+                        },
+
+                        height: 255,
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)',
+                        hoverlabel: {
+                            bgcolor: "#FFF",
+                            bordercolor: "#4a4cb3",
+                            font: { size: 12, color: "#000" }
+                        }
+                    };
+
+                    Plotly.newPlot('worst-months-chart', [traceStrategy, traceQAI, traceDow], layout, {
+                    responsive: true,
+                    displayModeBar: false
+                    });
+                });
 
   </script>
 
